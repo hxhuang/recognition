@@ -6,6 +6,8 @@
 #
 #
 import pytesseract
+import uuid
+from os import path, remove
 
 class Reader:
     def __init__(self):
@@ -14,11 +16,21 @@ class Reader:
     @classmethod
     def getMoney(cls, data):
         tesseract_cmd = "/usr/local/Cellar/tesseract/4.0.0"
-        try:
-            _image = pytesseract.image_to_string(data, config="--psm 9 sfz")
-            if _image:
-                return _image.replace("_", "")
+        _path = path.dirname(__file__)
+        _path = path.join(_path, "..", "caches", str(uuid.uuid4()) + ".png")
+        _money = "0.00"
 
-            return "0.00"
+        with open(_path, "wb") as up:
+            up.write(data['body'])
+
+
+
+        try:
+            _image = pytesseract.image_to_string(_path, config="--psm 9 sfz")
+            if _image:
+                _money = _image.replace("_", "")
         except Exception as error:
-            return "0.00"
+            pass
+
+        remove(_path)
+        return _money

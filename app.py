@@ -17,8 +17,11 @@ class handler(RequestHandler):
         self.write("Hello, world")
 
     def post(self, *args, **kwargs):
-        _file = self.request.files
-        _money = Reader.getMoney(_file)
+        _file = self.request.files.get('file')
+        _money = "0.00"
+
+        if _file:
+            _money = Reader.getMoney(_file[0])
 
         self.write(json.dumps({"money": _money, "time": int(time.time())}))
 
